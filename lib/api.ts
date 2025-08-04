@@ -116,12 +116,20 @@ export const journalApi = {
       // Convert the field and value to API format
       if (field === "date") {
         if (value instanceof Date) {
-          updateData.date = value.toISOString().split('T')[0]
+          // Use local date formatting instead of toISOString to avoid timezone issues
+          const year = value.getFullYear()
+          const month = String(value.getMonth() + 1).padStart(2, '0')
+          const day = String(value.getDate()).padStart(2, '0')
+          updateData.date = `${year}-${month}-${day}`
         } else if (typeof value === 'string' && value) {
           // If it's a string, try to parse it as a date
           const date = new Date(value)
           if (!isNaN(date.getTime())) {
-            updateData.date = date.toISOString().split('T')[0]
+            // Use local date formatting instead of toISOString
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+            const day = String(date.getDate()).padStart(2, '0')
+            updateData.date = `${year}-${month}-${day}`
           } else {
             updateData.date = null
           }
