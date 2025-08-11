@@ -115,7 +115,7 @@ export default function TradingJournal() {
         {/* Header with Stats */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
               Trading Journal
             </h1>
             <StatsFilter 
@@ -126,28 +126,14 @@ export default function TradingJournal() {
           </div>
       
           
-          <p className="text-gray-600 text-lg mb-6">Track your trades and analyze your performance</p>
+          <p className="text-gray-600 text-sm mb-6">Track your trades and analyze your performance</p>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"> {/* Adjusted gap */}
             {loading ? (
-              <>
-                <div className="bg-white/70 backdrop-blur-sm border-0 shadow-xl rounded-lg p-6">
-                  <div className="flex items-center justify-center h-20">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                  </div>
-                </div>
-                <div className="bg-white/70 backdrop-blur-sm border-0 shadow-xl rounded-lg p-6">
-                  <div className="flex items-center justify-center h-20">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                  </div>
-                </div>
-                <div className="bg-white/70 backdrop-blur-sm border-0 shadow-xl rounded-lg p-6">
-                  <div className="flex items-center justify-center h-20">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                  </div>
-                </div>
-              </>
+              <div className="bg-white/70 backdrop-blur-sm border-0 shadow-xl rounded-lg p-6 flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+              </div>
             ) : stats ? (
               <>
                 <StatsCard 
@@ -185,7 +171,7 @@ export default function TradingJournal() {
               </CardTitle>
               <Button
                 onClick={handleAddNewEntry}
-                size="lg"
+                size="sm"
                 disabled={saving === "creating"}
                 className="gap-3 text-base bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
               >
@@ -208,7 +194,7 @@ export default function TradingJournal() {
                 <Button
                   onClick={handleAddNewEntry}
                   variant="outline"
-                  size="lg"
+                  size="sm"
                   disabled={saving === "creating"}
                   className="gap-3 hover:bg-blue-50 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 bg-transparent"
                 >

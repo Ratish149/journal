@@ -51,17 +51,17 @@ export function JournalTable({
       <div className="min-w-[1760px]">
         {/* Header */}
         <div className="grid grid-cols-11 gap-px bg-gradient-to-r from-gray-100 to-gray-200 border-b border-gray-300">
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Date</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">LTF</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">HTF</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Bias</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Results</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Array</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">P&L</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Emotions</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Mistake</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Reason</div>
-          <div className="bg-white/90 p-4 font-bold text-base text-gray-800">Actions</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Date</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">LTF</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">HTF</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Bias</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Results</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Array</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">P&L</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Emotions</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Mistake</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Reason</div>
+          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Actions</div>
         </div>
 
         {/* Rows */}
@@ -72,16 +72,16 @@ export function JournalTable({
               index % 2 === 0 ? "bg-white/50" : "bg-gray-50/50"
             }`}
           >
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "date")}</div>
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "ltf")}</div>
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "htf")}</div>
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "bias")}</div>
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "results")}</div>
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "array")}</div>
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "pnl")}</div>
-            <div className="bg-white/80 min-h-[70px]">{renderCell(entry, "emotions")}</div>
-            <div className="bg-white/80 min-h-[90px]">{renderCell(entry, "mistake")}</div>
-            <div className="bg-white/80 min-h-[90px]">{renderCell(entry, "reason")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "date")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "ltf")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "htf")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "bias")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "results")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "array")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "pnl")}</div>
+            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "emotions")}</div>
+            <div className="bg-white/80 min-h-[90px] text-sm">{renderCell(entry, "mistake")}</div>
+            <div className="bg-white/80 min-h-[90px] text-sm">{renderCell(entry, "reason")}</div>
             <div className="bg-white/80 p-3 flex items-center justify-center gap-2 min-h-[70px]">
               <Button
                 variant="outline"

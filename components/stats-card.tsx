@@ -56,7 +56,7 @@ export function StatsCard({ title, value, type, trend = "neutral" }: StatsCardPr
 
   return (
     <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-      <CardContent className="p-6">
+      <CardContent className="p-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600">{title}</p>
