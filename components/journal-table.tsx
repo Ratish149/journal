@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { ExternalLink, Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { JournalEntry, EditingCell } from "@/types/journal"
@@ -27,81 +26,110 @@ export function JournalTable({
   onCellBlur,
   onDeleteEntry,
 }: JournalTableProps) {
-  const router = useRouter()
 
   const handleViewEntry = (entry: JournalEntry) => {
-    router.push(`/detail/${entry.id}`)
+    window.open(`/detail/${entry.id}`, '_blank')
   }
-  
-  const renderCell = (entry: JournalEntry, column: keyof JournalEntry) => (
-    <EditableCell
-      entry={entry}
-      column={column}
-      isEditing={editingCell?.rowId === entry.id && editingCell?.column === column}
-      isSaving={saving === entry.id}
-      onEdit={() => onCellClick(entry.id, column)}
-      onUpdateUI={(value) => onUpdateUI(entry.id, column, value)}
-      onSaveOnBlur={(value) => onSaveOnBlur(entry.id, column, value)}
-      onBlur={onCellBlur}
-    />
-  )
+
+  const truncateText = (text: string, wordLimit: number = 10): string => {
+    if (!text) return ""
+    const words = text.trim().split(/\s+/)
+    return words.length > wordLimit ? words.slice(0, wordLimit).join(" ") + "..." : text
+  }
+
+  const renderCell = (entry: JournalEntry, column: keyof JournalEntry, shouldTruncate: boolean = false) => {
+    const cellValue = shouldTruncate ? truncateText(entry[column] as string) : entry[column]
+
+    return (
+      <EditableCell
+        entry={{ ...entry, [column]: cellValue }}
+        column={column}
+        isEditing={editingCell?.rowId === entry.id && editingCell?.column === column}
+        isSaving={saving === entry.id}
+        onEdit={() => onCellClick(entry.id, column)}
+        onUpdateUI={(value) => onUpdateUI(entry.id, column, value)}
+        onSaveOnBlur={(value) => onSaveOnBlur(entry.id, column, value)}
+        onBlur={onCellBlur}
+      />
+    )
+  }
 
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-[1760px]">
+      <div className="min-w-[1400px]">
         {/* Header */}
-        <div className="grid grid-cols-11 gap-px bg-gradient-to-r from-gray-100 to-gray-200 border-b border-gray-300">
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Date</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">LTF</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">HTF</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Bias</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Results</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Array</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">P&L</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Emotions</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Mistake</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Reason</div>
-          <div className="bg-white/90 p-4 font-bold text-sm text-gray-800">Actions</div>
+        <div className="grid grid-cols-11 gap-0 bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 rounded-t-lg">
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200 first:rounded-tl-lg">Date</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 last:rounded-tr-lg">Actions</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">LTF</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">HTF</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Bias</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Results</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Array</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">P&L</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Emotions</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Mistake</div>
+          <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Reason</div>
         </div>
 
         {/* Rows */}
         {entries.map((entry, index) => (
           <div
             key={entry.id}
-            className={`grid grid-cols-11 gap-px border-b border-gray-200 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 transition-all duration-200 ${
-              index % 2 === 0 ? "bg-white/50" : "bg-gray-50/50"
-            }`}
+            className={`grid grid-cols-11 gap-0 border-l border-r border-b border-slate-200 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 transition-all duration-150 ${index % 2 === 0 ? "bg-white" : "bg-slate-50/30"
+              } ${index === entries.length - 1 ? "rounded-b-lg" : ""}`}
           >
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "date")}</div>
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "ltf")}</div>
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "htf")}</div>
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "bias")}</div>
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "results")}</div>
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "array")}</div>
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "pnl")}</div>
-            <div className="bg-white/80 min-h-[70px] text-sm">{renderCell(entry, "emotions")}</div>
-            <div className="bg-white/80 min-h-[90px] text-sm">{renderCell(entry, "mistake")}</div>
-            <div className="bg-white/80 min-h-[90px] text-sm">{renderCell(entry, "reason")}</div>
-            <div className="bg-white/80 p-3 flex items-center justify-center gap-2 min-h-[70px]">
+            <div className="bg-inherit p-2 flex items-center justify-center gap-1 min-h-[50px]">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleViewEntry(entry)}
-                className="gap-2 hover:bg-blue-50 border-blue-200 shadow-sm hover:shadow-md transition-all duration-200"
+                className="h-7 px-2 text-xs gap-1 hover:bg-blue-50 border-blue-200 shadow-sm hover:shadow transition-all duration-150"
               >
-                <ExternalLink className="h-4 w-4" />
+                <ExternalLink className="h-3 w-3" />
                 View
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onDeleteEntry(entry.id)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 shadow-sm hover:shadow-md transition-all duration-200"
+                className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 shadow-sm hover:shadow transition-all duration-150"
                 disabled={saving === entry.id}
               >
-                {saving === entry.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {saving === entry.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
               </Button>
             </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+              {renderCell(entry, "date")}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.ltf}>
+              {renderCell(entry, "ltf", true)}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.htf}>
+              {renderCell(entry, "htf", true)}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+              {renderCell(entry, "bias")}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+              {renderCell(entry, "results")}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+              {renderCell(entry, "array")}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+              {renderCell(entry, "pnl")}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+              {renderCell(entry, "emotions")}
+            </div>
+            <div className="bg-inherit p-2 min-h-[60px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.mistake}>
+              {renderCell(entry, "mistake", true)}
+            </div>
+            <div className="bg-inherit p-2 min-h-[60px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.reason}>
+              {renderCell(entry, "reason", true)}
+            </div>
+
           </div>
         ))}
       </div>
