@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { type JournalEntry, EMOTION_OPTIONS, RESULTS_OPTIONS, ARRAY_OPTIONS } from "@/types/journal"
+import { type JournalEntry, EMOTION_OPTIONS, RESULTS_OPTIONS, ARRAY_OPTIONS, BIAS_OPTIONS } from "@/types/journal"
 import { MultiSelectCell } from "./multi-select-cell"
 
 interface EditableCellProps {
@@ -117,28 +116,32 @@ export function EditableCell({
     if (isSubColumn) {
       const subColumnValue = getSubColumnValue()
 
-      // Handle bias sub-column
+      // Handle bias sub-column using multi-select with free input
       if (column === 'bias' && subColumn === 'bias') {
+        const biasValues = typeof entry.bias === 'string'
+          ? entry.bias.split(',').map(s => s.trim()).filter(Boolean)
+          : Array.isArray(entry.bias)
+            ? entry.bias as unknown as string[]
+            : []
+
         return (
-          <div className="w-full h-full flex items-center">
-            <Select
-              value={entry.bias || ''}
-              onValueChange={(value) => {
-                onUpdateUI(value)
-                onSaveOnBlur(value)
-                onBlur()
-              }}
-            >
-              <SelectTrigger className="border-0 shadow-none bg-transparent hover:bg-gray-50">
-                <SelectValue placeholder="Select bias" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="buy">Buy</SelectItem>
-                <SelectItem value="sell">Sell</SelectItem>
-                <SelectItem value="">Not Set</SelectItem>
-              </SelectContent>
-            </Select>
-            {isSaving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+          <div className="w-full h-full" onClick={(e) => { e.stopPropagation(); onEdit() }}>
+            <MultiSelectCell
+              value={biasValues}
+              options={Array.from(BIAS_OPTIONS).filter(Boolean)}
+              placeholder={`bias...`}
+              isEditing={true}
+              isSaving={isSaving}
+              onEdit={() => onEdit()}
+              onUpdateUI={(value) => handleSubColumnUpdate(value.join(','))}
+              onSaveOnBlur={(value) => handleSubColumnSave(value.join(','))}
+              onBlur={onBlur}
+              getBadgeColor={(option) => option.toLowerCase() === 'buy'
+                ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200"
+                : option.toLowerCase() === 'sell'
+                ? "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border-red-200"
+                : "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200"}
+            />
           </div>
         )
       }
@@ -283,6 +286,29 @@ export function EditableCell({
               />
             </PopoverContent>
           </Popover>
+        )
+
+      case "bias":
+        return (
+          <MultiSelectCell
+            value={(typeof entry.bias === 'string' ? entry.bias.split(',').map(s => s.trim()).filter(Boolean) : [])}
+            options={Array.from(BIAS_OPTIONS).filter(Boolean)}
+            placeholder="Select bias"
+            isEditing={true}
+            isSaving={isSaving}
+            onEdit={onEdit}
+            onUpdateUI={(value: string[]) => onUpdateUI(value.join(","))}
+            onSaveOnBlur={(value: string[]) => {
+              onSaveOnBlur(value.join(","))
+              onBlur()
+            }}
+            onBlur={onBlur}
+            getBadgeColor={(option) => option.toLowerCase() === 'buy'
+              ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200"
+              : option.toLowerCase() === 'sell'
+              ? "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border-red-200"
+              : "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200"}
+          />
         )
 
       case "array":
@@ -579,26 +605,26 @@ export function EditableCell({
       )
 
     case "bias":
+      const biasValuesDisplay = typeof entry.bias === 'string'
+        ? entry.bias.split(',').map(s => s.trim()).filter(Boolean)
+        : []
       return (
-        <div
-          className="p-2 min-h-[50px] flex items-center cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-lg transition-all duration-200"
-          onClick={onEdit}
-        >
-          <Badge
-            variant={entry.bias === "buy" ? "default" : entry.bias === "sell" ? "destructive" : "secondary"}
-            className={`text-xs ${entry.bias === "buy"
-              ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
-              : entry.bias === "sell"
-                ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700"
-                : "bg-gradient-to-r from-gray-500 to-slate-600"
-              } shadow-sm transition-all duration-200`}
-          >
-            {entry.bias === "buy" && <TrendingUp className="mr-1 h-2 w-2" />}
-            {entry.bias === "sell" && <TrendingDown className="mr-1 h-2 w-2" />}
-            {entry.bias || "Select bias"}
-          </Badge>
-          {isSaving && <Loader2 className="ml-2 h-3 w-3 animate-spin text-blue-600" />}
-        </div>
+        <MultiSelectCell
+          value={biasValuesDisplay}
+          options={Array.from(BIAS_OPTIONS).filter(Boolean)}
+          placeholder="bias"
+          isEditing={false}
+          isSaving={isSaving}
+          onEdit={onEdit}
+          onUpdateUI={(value: string[]) => onUpdateUI(value.join(","))}
+          onSaveOnBlur={(value: string[]) => onSaveOnBlur(value.join(","))}
+          onBlur={onBlur}
+          getBadgeColor={(option) => option.toLowerCase() === 'buy'
+            ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200"
+            : option.toLowerCase() === 'sell'
+            ? "bg-gradient-to-r from-red-100 to-rose-100 text-red-800 border-red-200"
+            : "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border-blue-200"}
+        />
       )
 
     case "results":
@@ -687,8 +713,8 @@ export function EditableCell({
           onClick={onEdit}
         >
           <span
-            className={`text-gray-700 leading-relaxed text-xs ${column === "mistake" || column === "reason" ? "whitespace-pre-wrap break-words" : "truncate"
-              }`}
+            className={`text-gray-700 leading-relaxed text-xs truncate`}
+            title={(entry[column] as string) || `Enter ${column}...`}
           >
             {entry[column] || `Enter ${column}...`}
           </span>

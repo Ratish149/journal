@@ -4,6 +4,7 @@ export interface JournalEntry {
   ltf: string; // LTF chart URL
   htf: string; // HTF chart URL
   bias: "buy" | "sell" | "";
+  kill_zone: string;
   array: string[]; // Multiple array values
   results: string[]; // Multiple result values
   pnl: number;
@@ -29,6 +30,7 @@ export interface ApiJournalEntry {
   ltf: string;
   htf: string;
   bias: "buy" | "sell" | "";
+  kill_zone: string;
   array: string; // Comma-separated array values from backend
   results: string; // Comma-separated result values from backend
   pnl: string; // DecimalField comes as string from Django
@@ -72,7 +74,9 @@ export const EMOTION_OPTIONS = [
   "Neutral",
 ] as const;
 
-export const ARRAY_OPTIONS = ["FVG", "Asian High Low", "OB"] as const;
+export const BIAS_OPTIONS = ["buy", "sell", ""] as const;
+
+export const ARRAY_OPTIONS = ["FVG", "Asian High Low", "OB","LQ"] as const;
 
 export const RESULTS_OPTIONS = [
   "Win",

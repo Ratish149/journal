@@ -71,12 +71,13 @@ export function JournalTable({
       <div className="min-w-[1600px]">
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 rounded-t-lg">
-          <div className="grid grid-cols-13 gap-0">
+          <div className="grid grid-cols-14 gap-0">
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 first:rounded-tl-lg border-r border-slate-200">Actions</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Date</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">LTF</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">HTF</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Bias</div>
+            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Kill Zone</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Results</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Array</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">P&L</div>
@@ -85,6 +86,7 @@ export function JournalTable({
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">After Trade Emotions</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Mistake</div>
             <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 last:rounded-tr-lg">Reason</div>
+
           </div>
         </div>
 
@@ -92,7 +94,7 @@ export function JournalTable({
         {entries.map((entry, index) => (
           <div
             key={entry.id}
-            className={`grid grid-cols-13 gap-0 border-l border-r border-b border-slate-200 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 transition-all duration-150 ${index % 2 === 0 ? "bg-white" : "bg-slate-50/30"
+            className={`grid grid-cols-14 gap-0 border-l border-r border-b border-slate-200 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 transition-all duration-150 ${index % 2 === 0 ? "bg-white" : "bg-slate-50/30"
               } ${index === entries.length - 1 ? "rounded-b-lg" : ""}`}
           >
             {/* Actions */}
@@ -129,6 +131,9 @@ export function JournalTable({
             </div>
             <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
               {renderCell(entry, "bias")}
+            </div>
+            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+              {renderCell(entry, "kill_zone")}
             </div>
             <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
               {renderCell(entry, "results")}

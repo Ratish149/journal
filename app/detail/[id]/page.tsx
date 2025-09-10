@@ -146,7 +146,7 @@ export default function JournalDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 top-0 z-10 shadow-sm">
+      <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200/60 top-0 z-10 shadow-sm">
         <div className="max-w-full mx-auto px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
@@ -154,7 +154,7 @@ export default function JournalDetailPage() {
                 variant="ghost"
                 size="lg"
                 onClick={handleBack}
-                className="gap-3 text-base hover:bg-blue-50 transition-colors"
+                className="gap-3 text-base hover:bg-blue-50 transition-colors rounded-xl"
               >
                 <ArrowLeft className="h-5 w-5" />
                 Back to Journal
@@ -168,7 +168,7 @@ export default function JournalDetailPage() {
               variant="destructive"
               size="lg"
               onClick={() => handleDelete(entry.id)}
-              className="gap-3 text-base bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg"
+              className="gap-3 text-base bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg rounded-xl"
               disabled={saving === entry.id}
             >
               {saving === entry.id ? <Loader2 className="h-5 w-5 animate-spin" /> : <Trash2 className="h-5 w-5" />}
@@ -201,7 +201,7 @@ export default function JournalDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <Card className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                 Reason for Trade
@@ -210,7 +210,7 @@ export default function JournalDetailPage() {
             <CardContent>{renderCell("reason")}</CardContent>
           </Card>
 
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <Card className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                 Mistakes & Lessons
@@ -222,7 +222,7 @@ export default function JournalDetailPage() {
 
         {/* Trade Details - iPad Optimized Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <Card className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 Trade Information
@@ -241,10 +241,14 @@ export default function JournalDetailPage() {
                 <label className="text-base font-semibold text-gray-700 block mb-3">Array</label>
                 {renderCell("array")}
               </div>
+              <div>
+                <label className="text-base font-semibold text-gray-700 block mb-3">Kill Zone</label>
+                {renderCell("kill_zone")}
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <Card className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                 Chart URLs
@@ -262,7 +266,7 @@ export default function JournalDetailPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <Card className="bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                 Performance
@@ -274,16 +278,26 @@ export default function JournalDetailPage() {
                 {renderCell("pnl")}
               </div>
               <div>
-                <label className="text-base font-semibold text-gray-700 block mb-3">Emotions</label>
-                {renderCell("emotions")}
+                <label className="text-base font-semibold text-gray-700 block mb-3">Results</label>
+                {renderCell("results")}
+              </div>
+              <div>
+                <label className="text-base font-semibold text-gray-700 block mb-3">Before Trade Emotions</label>
+                {renderCell("before_trade_emotions")}
+              </div>
+              <div>
+                <label className="text-base font-semibold text-gray-700 block mb-3">In-Trade Emotions</label>
+                {renderCell("in_trade_emotions")}
+              </div>
+              <div>
+                <label className="text-base font-semibold text-gray-700 block mb-3">After Trade Emotions</label>
+                {renderCell("after_trade_emotions")}
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Analysis Section - Full Width */}
-       
+        
       </div>
     </div>
   )
-} 
+}

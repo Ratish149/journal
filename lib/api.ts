@@ -15,6 +15,7 @@ function convertApiEntry(apiEntry: ApiJournalEntry): JournalEntry {
     ltf: apiEntry.ltf,
     htf: apiEntry.htf,
     bias: apiEntry.bias,
+    kill_zone: apiEntry.kill_zone,
     array: apiEntry.array
       ? apiEntry.array
           .split(",")
@@ -127,6 +128,7 @@ export const journalApi = {
           ltf: "",
           htf: "",
           bias: "",
+          kill_zone: "",
           array: "",
           results: "",
           pnl: "0",
@@ -192,6 +194,7 @@ export const journalApi = {
         updateData.pnl = (value as number)?.toString() || "0";
       } else if (
         field === "array" ||
+        field === "bias" ||
         field === "emotions" ||
         field === "results" ||
         field === "before_trade_emotions" ||

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 
 interface MultiSelectCellProps {
   value: string[]
@@ -37,6 +38,7 @@ export function MultiSelectCell({
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const [customValue, setCustomValue] = useState("")
 
   useEffect(() => {
     // Ensure we always set an array
@@ -75,6 +77,7 @@ export function MultiSelectCell({
       : [...selectedValues, option]
 
     setSelectedValues(newValues)
+    setCustomValue(newValues.join(", "))
     // Don't call onUpdateUI here - only call it when Apply is clicked
   }
 
@@ -113,7 +116,41 @@ export function MultiSelectCell({
 
       setDropdownPosition({ top, left })
     }
+    setCustomValue((Array.isArray(selectedValues) ? selectedValues : []).join(", "))
     setIsOpen(true)
+  }
+
+  const handleAddCustom = () => {
+    const trimmed = customValue.trim()
+    if (!trimmed) return
+    const tokens = trimmed
+      .split(/[,\n]/)
+      .map((t) => t.trim())
+      .filter(Boolean)
+    const unique = Array.from(new Set(tokens))
+    setSelectedValues(unique)
+    setCustomValue(unique.join(", "))
+  }
+
+  const handleCustomKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === "NumpadEnter") {
+      e.preventDefault()
+      handleAddCustom()
+    } else if (e.key === "Backspace" && !customValue && selectedValues.length > 0) {
+      // Backspace removes last tag when input is empty
+      setSelectedValues(selectedValues.slice(0, -1))
+    }
+  }
+
+  const handleCustomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value
+    setCustomValue(text)
+    const tokens = text
+      .split(/[,\n]/)
+      .map((t) => t.trim())
+      .filter(Boolean)
+    const unique = Array.from(new Set(tokens))
+    setSelectedValues(unique)
   }
 
   if (isEditing) {
@@ -146,7 +183,7 @@ export function MultiSelectCell({
           <div className="fixed inset-0 z-[9999]">
             <div className="absolute inset-0 bg-black/20" onClick={handleCancel} />
             <div
-              className="absolute w-80 bg-white rounded-lg shadow-2xl border border-gray-200 max-h-96 overflow-hidden"
+              className="absolute w-80 bg-white rounded-lg shadow-2xl border border-gray-200 max-h-[80vh] overflow-hidden flex flex-col"
               style={{
                 top: `${dropdownPosition.top}px`,
                 left: `${dropdownPosition.left}px`
@@ -154,7 +191,7 @@ export function MultiSelectCell({
             >
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-gray-900 text-lg">Select {placeholder}</h3>
+                  <h3 className="font-semibold text-gray-900 text-lg">{placeholder}</h3>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -166,7 +203,23 @@ export function MultiSelectCell({
                 </div>
               </div>
 
-              <div className="p-4 max-h-64 overflow-y-auto">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={`Type to add...`}
+                    value={customValue}
+                    onChange={handleCustomChange}
+                    onKeyDown={handleCustomKeyDown}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleAddCustom} size="sm" variant="secondary">
+                    Add
+                  </Button>
+                </div>
+                <p className="text-[11px] text-gray-500 mt-2">Press Enter or comma to add multiple. Click options below to toggle.</p>
+              </div>
+
+              <div className="p-4 flex-1 overflow-y-auto">
                 <div className="space-y-2">
                   {options.map((option) => (
                     <label
@@ -190,7 +243,7 @@ export function MultiSelectCell({
                 </div>
               </div>
 
-              <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <div className="p-4 border-t border-gray-200 bg-gray-50 sticky bottom-0">
                 <div className="flex gap-2">
                   <Button
                     onClick={handleApply}
