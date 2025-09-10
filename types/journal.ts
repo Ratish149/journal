@@ -1,52 +1,59 @@
 export interface JournalEntry {
-  id: string
-  date: Date | null
-  ltf: string // LTF chart URL
-  htf: string // HTF chart URL
-  bias: "buy" | "sell" | ""
-  array: string[] // Multiple array values
-  results: string[] // Multiple result values
-  pnl: number
-  emotions: string[] // Multiple emotion values
-  mistake: string
-  reason: string
-  created_at?: string
-  updated_at?: string
+  id: string;
+  date: Date | null;
+  ltf: string; // LTF chart URL
+  htf: string; // HTF chart URL
+  bias: "buy" | "sell" | "";
+  array: string[]; // Multiple array values
+  results: string[]; // Multiple result values
+  pnl: number;
+  emotions: string | string[]; // Can be string (comma-separated) or array of strings
+  before_trade_emotions: string[]; // Before trade emotions
+  in_trade_emotions: string[]; // During trade emotions
+  after_trade_emotions: string[]; // After trade emotions
+  mistake: string;
+  reason: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface EditingCell {
-  rowId: string
-  column: keyof JournalEntry
+  rowId: string;
+  column: keyof JournalEntry;
+  subColumn?: string; // Add this for emotion sub-columns
 }
 
 export interface ApiJournalEntry {
-  id: number
-  date: string | null
-  ltf: string
-  htf: string
-  bias: "buy" | "sell" | ""
-  array: string // Comma-separated array values from backend
-  results: string // Comma-separated result values from backend
-  pnl: string // DecimalField comes as string from Django
-  emotions: string // Comma-separated emotion values from backend
-  mistake: string
-  reason: string
-  created_at: string
-  updated_at: string
+  id: number;
+  date: string | null;
+  ltf: string;
+  htf: string;
+  bias: "buy" | "sell" | "";
+  array: string; // Comma-separated array values from backend
+  results: string; // Comma-separated result values from backend
+  pnl: string; // DecimalField comes as string from Django
+  emotions: string; // Old emotion field - comma-separated values from backend
+  before_trade_emotions: string; // Comma-separated emotion values from backend
+  in_trade_emotions: string; // Comma-separated emotion values from backend
+  after_trade_emotions: string; // Comma-separated emotion values from backend
+  mistake: string;
+  reason: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TradingStats {
-  total_trades: number
-  winning_trades: number
-  losing_trades: number
-  total_pnl: string
-  win_rate: string
-  updated_at: string
+  total_trades: number;
+  winning_trades: number;
+  losing_trades: number;
+  total_pnl: string;
+  win_rate: string;
+  updated_at: string;
   period?: {
-    month: number
-    year: number
-    month_name: string
-  }
+    month: number;
+    year: number;
+    month_name: string;
+  };
 }
 
 export const EMOTION_OPTIONS = [
@@ -63,13 +70,9 @@ export const EMOTION_OPTIONS = [
   "FOMO",
   "Revenge Trading",
   "Neutral",
-] as const
+] as const;
 
-export const ARRAY_OPTIONS = [
-  "FVG",
-  "Asian High Low",
-  "OB",
-] as const
+export const ARRAY_OPTIONS = ["FVG", "Asian High Low", "OB"] as const;
 
 export const RESULTS_OPTIONS = [
   "Win",
@@ -79,5 +82,4 @@ export const RESULTS_OPTIONS = [
   "Missed",
   "Monday",
   "News",
-] as const
-  
+] as const;

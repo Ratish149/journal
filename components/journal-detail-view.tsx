@@ -1,7 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
-import { ArrowLeft, Trash2, Loader2, Calendar, TrendingUp, TrendingDown, BarChart3, Target, AlertTriangle, BookOpen } from "lucide-react"
+import { ArrowLeft, Trash2, Loader2, Calendar, TrendingUp, TrendingDown, BarChart3, Target, AlertTriangle, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { JournalEntry, EditingCell } from "@/types/journal"
@@ -14,8 +14,8 @@ interface JournalDetailViewProps {
   saving: string | null
   onBack: () => void
   onDelete: (id: string) => void
-  onCellClick: (rowId: string, column: keyof JournalEntry) => void
-  onCellUpdate: (id: string, field: keyof JournalEntry, value: string) => void
+  onCellClick: (rowId: string, column: keyof JournalEntry, subColumn?: string) => void
+  onCellUpdate: (id: string, field: keyof JournalEntry, value: string, subColumn?: string) => void
   onCellBlur: () => void
 }
 
@@ -29,15 +29,16 @@ export function JournalDetailView({
   onCellUpdate,
   onCellBlur,
 }: JournalDetailViewProps) {
-  const renderCell = (column: keyof JournalEntry) => (
+  const renderCell = (column: keyof JournalEntry, subColumn?: string) => (
     <EditableCell
       entry={entry}
       column={column}
-      isEditing={editingCell?.rowId === entry.id && editingCell?.column === column}
+      subColumn={subColumn}
+      isEditing={editingCell?.rowId === entry.id && editingCell?.column === column && editingCell?.subColumn === subColumn}
       isSaving={saving === entry.id}
-      onEdit={() => onCellClick(entry.id, column)}
-      onUpdateUI={(value: string) => onCellUpdate(entry.id, column, value)}
-      onSaveOnBlur={(value: string) => onCellUpdate(entry.id, column, value)}
+      onEdit={() => onCellClick(entry.id, column, subColumn)}
+      onUpdateUI={(value: string) => onCellUpdate(entry.id, column, value, subColumn)}
+      onSaveOnBlur={(value: string) => onCellUpdate(entry.id, column, value, subColumn)}
       onBlur={onCellBlur}
     />
   )
@@ -121,7 +122,9 @@ export function JournalDetailView({
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Array Type</p>
-                <p className="text-lg font-bold text-gray-900">{entry.array || "Not Set"}</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {Array.isArray(entry.array) ? entry.array.join(", ") : entry.array || "Not Set"}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -137,17 +140,19 @@ export function JournalDetailView({
             </div>
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl">
-                <BookOpen className="h-4 w-4 text-amber-600" />
+                <Heart className="h-4 w-4 text-amber-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">Emotions</p>
-                <p className="text-lg font-bold text-gray-900">{entry.emotions || "Not Set"}</p>
+                <p className="text-sm font-medium text-gray-600">Results</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {Array.isArray(entry.results) ? entry.results.join(", ") : entry.results || "Not Set"}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Charts Section - Side by Side (Unchanged Layout) */}
+        {/* Charts Section - Side by Side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ChartDisplay
             title="Lower Time Frame"
@@ -191,6 +196,10 @@ export function JournalDetailView({
                 <label className="text-sm font-semibold text-gray-600 block mb-4 uppercase tracking-wide">Array</label>
                 {renderCell("array")}
               </div>
+              <div>
+                <label className="text-sm font-semibold text-gray-600 block mb-4 uppercase tracking-wide">Results</label>
+                {renderCell("results")}
+              </div>
             </CardContent>
           </Card>
 
@@ -229,13 +238,37 @@ export function JournalDetailView({
                 <label className="text-sm font-semibold text-gray-600 block mb-4 uppercase tracking-wide">P&L</label>
                 {renderCell("pnl")}
               </div>
-              <div>
-                <label className="text-sm font-semibold text-gray-600 block mb-4 uppercase tracking-wide">Emotions</label>
-                {renderCell("emotions")}
-              </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Enhanced Emotions Section */}
+        <Card className="bg-white/80 backdrop-blur-sm border border-white/60 shadow-2xl hover:shadow-3xl transition-all duration-500 rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-pink-50 to-rose-50 border-b border-pink-100/50">
+            <CardTitle className="text-xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-pink-100 to-rose-100 rounded-xl">
+                <Heart className="h-5 w-5 text-pink-600" />
+              </div>
+              Trading Emotions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div>
+                <label className="text-sm font-semibold text-gray-600 block mb-4 uppercase tracking-wide">Before Trade</label>
+                {renderCell("before_trade_emotions")}
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-gray-600 block mb-4 uppercase tracking-wide">During Trade</label>
+                {renderCell("in_trade_emotions")}
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-gray-600 block mb-4 uppercase tracking-wide">After Trade</label>
+                {renderCell("after_trade_emotions")}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Enhanced Analysis Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
