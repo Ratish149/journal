@@ -3,10 +3,13 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { journalApi } from "@/lib/api"
 import { JournalEntry } from "@/types/journal"
-import { BrainCircuit, Loader2, Sparkles } from "lucide-react"
-import { useState } from "react"
+import { BrainCircuit, Loader2, Sparkles, Upload } from "lucide-react"
+import { useEffect, useState } from "react"
 
 interface AiPredictionCardProps {
   entry: JournalEntry
@@ -15,6 +18,17 @@ interface AiPredictionCardProps {
 
 export function AiPredictionCard({ entry, onUpdate }: AiPredictionCardProps) {
   const [loading, setLoading] = useState(false)
+  const [showUploadModal, setShowUploadModal] = useState(false)
+  const [ltfFile, setLtfFile] = useState<File | null>(null)
+  const [htfFile, setHtfFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+
+  // Check if AI analysis indicates no images found
+  useEffect(() => {
+    if (entry.ai_analysis && entry.ai_analysis.includes("No valid images")) {
+      setShowUploadModal(true)
+    }
+  }, [entry.ai_analysis])
 
   const handlePredict = async () => {
     setLoading(true)
@@ -28,6 +42,35 @@ export function AiPredictionCard({ entry, onUpdate }: AiPredictionCardProps) {
     }
   }
 
+  const handleUpload = async () => {
+    if (!ltfFile && !htfFile) return
+
+    setUploading(true)
+    try {
+      // Upload LTF image if provided
+      if (ltfFile) {
+        await journalApi.updateEntry(entry.id, "ltf_image", ltfFile)
+      }
+      
+      // Upload HTF image if provided
+      if (htfFile) {
+        await journalApi.updateEntry(entry.id, "htf_image", htfFile)
+      }
+
+      // Close modal and retry analysis
+      setShowUploadModal(false)
+      setLtfFile(null)
+      setHtfFile(null)
+      
+      // Retry prediction after upload
+      await handlePredict()
+    } catch (error) {
+      console.error("Failed to upload images:", error)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const getBiasColor = (bias: string | undefined) => {
     if (!bias) return "bg-gray-100 text-gray-800"
     const b = bias.toLowerCase()
@@ -37,62 +80,151 @@ export function AiPredictionCard({ entry, onUpdate }: AiPredictionCardProps) {
   }
 
   return (
-    <Card className="bg-white/40 backdrop-blur-md border-indigo-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden group">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
-      <CardHeader className="relative flex flex-row items-center justify-between pb-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-100 rounded-lg group-hover:scale-110 transition-transform duration-300">
-            <BrainCircuit className="h-5 w-5 text-indigo-600" />
+    <>
+      <Card className="bg-white/40 backdrop-blur-md border-indigo-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
+        <CardHeader className="relative flex flex-row items-center justify-between pb-2">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-100 rounded-lg group-hover:scale-110 transition-transform duration-300">
+              <BrainCircuit className="h-5 w-5 text-indigo-600" />
+            </div>
+            <CardTitle className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              AI Trade Analysis
+            </CardTitle>
           </div>
-          <CardTitle className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            AI Trade Analysis
-          </CardTitle>
-        </div>
-        <Button
-          onClick={handlePredict}
-          disabled={loading || !entry.ltf || !entry.htf}
-          variant="outline"
-          size="sm"
-          className="gap-2 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 transition-all rounded-xl shadow-sm"
-        >
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+          <Button
+            onClick={handlePredict}
+            disabled={loading || !entry.ltf || !entry.htf}
+            variant="outline"
+            size="sm"
+            className="gap-2 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 transition-all rounded-xl shadow-sm"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {entry.ai_bias_prediction ? "Re-analyze" : "Analyze Charts"}
+          </Button>
+        </CardHeader>
+        <CardContent className="relative space-y-4">
+          {entry.ai_bias_prediction ? (
+            <>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-slate-500 uppercase tracking-wider">AI Bias Prediction:</span>
+                <Badge className={`${getBiasColor(entry.ai_bias_prediction)} px-3 py-1 text-sm font-bold border rounded-full shadow-sm`}>
+                  {entry.ai_bias_prediction}
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                <span className="text-sm font-medium text-slate-500 uppercase tracking-wider block">AI Analysis:</span>
+                <div className="p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-indigo-100/50 text-slate-700 text-sm leading-relaxed shadow-inner italic">
+                  {entry.ai_analysis}
+                </div>
+                {entry.ai_analysis && entry.ai_analysis.includes("No valid images") && (
+                  <Button
+                    onClick={() => setShowUploadModal(true)}
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-2 border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 mt-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Upload Chart Images
+                  </Button>
+                )}
+              </div>
+            </>
           ) : (
-            <Sparkles className="h-4 w-4" />
+            <div className="py-8 text-center space-y-3">
+              <div className="inline-block p-4 bg-slate-50 rounded-full mb-2">
+                <Sparkles className="h-8 w-8 text-slate-300 mx-auto" />
+              </div>
+              <p className="text-slate-500 text-sm max-w-[280px] mx-auto leading-relaxed">
+                Use Gemini AI to analyze your LTF and HTF charts to identify bias and key technical factors.
+              </p>
+              {!entry.ltf || !entry.htf ? (
+                <p className="text-amber-500 text-xs font-medium">Please add both chart URLs first</p>
+              ) : null}
+            </div>
           )}
-          {entry.ai_bias_prediction ? "Re-analyze" : "Analyze Charts"}
-        </Button>
-      </CardHeader>
-      <CardContent className="relative space-y-4">
-        {entry.ai_bias_prediction ? (
-          <>
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-slate-500 uppercase tracking-wider">AI Bias Prediction:</span>
-              <Badge className={`${getBiasColor(entry.ai_bias_prediction)} px-3 py-1 text-sm font-bold border rounded-full shadow-sm`}>
-                {entry.ai_bias_prediction}
-              </Badge>
+        </CardContent>
+      </Card>
+
+      <Dialog open={showUploadModal} onOpenChange={setShowUploadModal}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-indigo-600" />
+              Upload Chart Images
+            </DialogTitle>
+            <DialogDescription>
+              The AI couldn&apos;t fetch your chart images automatically. Please upload them manually for analysis.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="ltf-upload" className="text-sm font-semibold">
+                LTF Chart Image
+              </Label>
+              <Input
+                id="ltf-upload"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setLtfFile(e.target.files?.[0] || null)}
+                className="cursor-pointer"
+              />
+              {ltfFile && (
+                <p className="text-xs text-green-600">✓ {ltfFile.name}</p>
+              )}
             </div>
             <div className="space-y-2">
-              <span className="text-sm font-medium text-slate-500 uppercase tracking-wider block">AI Analysis:</span>
-              <div className="p-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-indigo-100/50 text-slate-700 text-sm leading-relaxed shadow-inner italic">
-                {entry.ai_analysis}
-              </div>
+              <Label htmlFor="htf-upload" className="text-sm font-semibold">
+                HTF Chart Image
+              </Label>
+              <Input
+                id="htf-upload"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setHtfFile(e.target.files?.[0] || null)}
+                className="cursor-pointer"
+              />
+              {htfFile && (
+                <p className="text-xs text-green-600">✓ {htfFile.name}</p>
+              )}
             </div>
-          </>
-        ) : (
-          <div className="py-8 text-center space-y-3">
-            <div className="inline-block p-4 bg-slate-50 rounded-full mb-2">
-              <Sparkles className="h-8 w-8 text-slate-300 mx-auto" />
-            </div>
-            <p className="text-slate-500 text-sm max-w-[280px] mx-auto leading-relaxed">
-              Use Gemini AI to analyze your LTF and HTF charts to identify bias and key technical factors.
-            </p>
-            {!entry.ltf || !entry.htf ? (
-              <p className="text-amber-500 text-xs font-medium">Please add both chart URLs first</p>
-            ) : null}
           </div>
-        )}
-      </CardContent>
-    </Card>
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowUploadModal(false)
+                setLtfFile(null)
+                setHtfFile(null)
+              }}
+              disabled={uploading}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpload}
+              disabled={uploading || (!ltfFile && !htfFile)}
+              className="gap-2"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-4 w-4" />
+                  Upload & Analyze
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
