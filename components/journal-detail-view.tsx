@@ -1,10 +1,10 @@
 "use client"
 
-import { format } from "date-fns"
-import { ArrowLeft, Trash2, Loader2, Calendar, TrendingUp, TrendingDown, BarChart3, Target, AlertTriangle, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { JournalEntry, EditingCell } from "@/types/journal"
+import type { EditingCell, JournalEntry } from "@/types/journal"
+import { format } from "date-fns"
+import { AlertTriangle, ArrowLeft, BarChart3, Calendar, Heart, Loader2, Target, Trash2, TrendingDown, TrendingUp } from "lucide-react"
 import { ChartDisplay } from "./chart-display"
 import { EditableCell } from "./editable-cell"
 
@@ -15,7 +15,7 @@ interface JournalDetailViewProps {
   onBack: () => void
   onDelete: (id: string) => void
   onCellClick: (rowId: string, column: keyof JournalEntry, subColumn?: string) => void
-  onCellUpdate: (id: string, field: keyof JournalEntry, value: string, subColumn?: string) => void
+  onCellUpdate: (id: string, field: keyof JournalEntry, value: string | File, subColumn?: string) => void
   onCellBlur: () => void
 }
 
@@ -37,8 +37,8 @@ export function JournalDetailView({
       isEditing={editingCell?.rowId === entry.id && editingCell?.column === column && editingCell?.subColumn === subColumn}
       isSaving={saving === entry.id}
       onEdit={() => onCellClick(entry.id, column, subColumn)}
-      onUpdateUI={(value: string) => onCellUpdate(entry.id, column, value, subColumn)}
-      onSaveOnBlur={(value: string) => onCellUpdate(entry.id, column, value, subColumn)}
+      onUpdateUI={(value: string | File) => onCellUpdate(entry.id, column, value, subColumn)}
+      onSaveOnBlur={(value: string | File) => onCellUpdate(entry.id, column, value, subColumn)}
       onBlur={onCellBlur}
     />
   )

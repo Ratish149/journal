@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { Plus, Loader2, AlertCircle, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { JournalEntry, EditingCell } from "@/types/journal"
-import { useJournalWithFilter } from "@/hooks/use-journal-with-filter"
+import { JournalTable } from "@/components/journal-table"
 import { StatsCard } from "@/components/stats-card"
 import { StatsFilter } from "@/components/stats-filter"
-import { JournalTable } from "@/components/journal-table"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useJournalWithFilter } from "@/hooks/use-journal-with-filter"
+import type { EditingCell, JournalEntry } from "@/types/journal"
+import { AlertCircle, Loader2, Plus, X } from "lucide-react"
+import { useState } from "react"
 
 export default function TradingJournal() {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
@@ -38,11 +38,11 @@ export default function TradingJournal() {
     }
   }
 
-  const handleUpdateUI = (id: string, field: keyof JournalEntry, value: string) => {
+  const handleUpdateUI = (id: string, field: keyof JournalEntry, value: string | File) => {
     updateUIOnly(id, field, value)
   }
 
-  const handleSaveOnBlur = async (id: string, field: keyof JournalEntry, value: string) => {
+  const handleSaveOnBlur = async (id: string, field: keyof JournalEntry, value: string | File) => {
     try {
       await saveOnBlur(id, field, value)
     } catch (error) {

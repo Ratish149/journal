@@ -66,7 +66,7 @@ export default function JournalDetailPage() {
     setEditingCell({ rowId, column })
   }
 
-  const handleCellUpdate = async (id: string, field: keyof JournalEntry, value: string) => {
+  const handleCellUpdate = async (id: string, field: keyof JournalEntry, value: string | File) => {
     try {
       setSaving(id)
       const updatedEntry = await journalApi.updateEntry(id, field, value)
@@ -95,11 +95,13 @@ export default function JournalDetailPage() {
         isEditing={editingCell?.rowId === entry.id && editingCell?.column === column}
         isSaving={saving === entry.id}
         onEdit={() => handleCellClick(entry.id, column)}
-        onUpdateUI={(value: string) => {
+        onUpdateUI={(value: string | File) => {
           // Update local state immediately for UI responsiveness
-          setEntry({ ...entry, [column]: value })
+          if (typeof value === "string") {
+            setEntry({ ...entry, [column]: value })
+          }
         }}
-        onSaveOnBlur={(value: string) => handleCellUpdate(entry.id, column, value)}
+        onSaveOnBlur={(value: string | File) => handleCellUpdate(entry.id, column, value)}
         onBlur={handleCellBlur}
       />
     )

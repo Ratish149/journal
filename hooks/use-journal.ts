@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import type { JournalEntry } from "@/types/journal";
 import { journalApi } from "@/lib/api";
+import type { JournalEntry } from "@/types/journal";
+import { useCallback, useState } from "react";
 
 export function useJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -45,7 +45,7 @@ export function useJournal() {
     async (
       id: string,
       field: keyof JournalEntry,
-      value: string | string[] | number | Date | null
+      value: string | string[] | number | Date | null | File
     ) => {
       setSaving(id);
       setError(null);
@@ -84,7 +84,7 @@ export function useJournal() {
     (
       id: string,
       field: keyof JournalEntry,
-      value: string | string[] | number | Date | null
+      value: string | string[] | number | Date | null | File
     ) => {
       let processedValue = value;
 
@@ -126,10 +126,37 @@ export function useJournal() {
     async (
       id: string,
       field: keyof JournalEntry,
-      value: string | string[] | number | Date | null
+      value: string | string[] | number | Date | null | File
     ) => {
       try {
         await updateEntry(id, field, value);
+
+        // Auto-fetch logic for TradingView URLs
+        if ((field === "ltf" || field === "htf") && typeof value === "string" && value.includes("tradingview.com")) {
+          console.log(`Detected TradingView URL for ${field}, attempting auto-fetch...`);
+          
+          try {
+            let directImageUrl = value;
+            
+            // Try to convert TradingView snapshot share URL to direct image URL
+            // Example: https://www.tradingview.com/x/ID/ -> https://s3.tradingview.com/snapshots/{firstChar}/{ID}.png
+            const snapshotMatch = value.match(/tradingview\.com\/x\/([^/]+)/);
+            if (snapshotMatch) {
+              const snapshotId = snapshotMatch[1];
+              const firstChar = snapshotId.charAt(0).toLowerCase();
+              directImageUrl = `https://s3.tradingview.com/snapshots/${firstChar}/${snapshotId}.png`;
+            }
+
+            const imageFile = await journalApi.fetchExternalImage(directImageUrl, `${field}_auto.png`);
+            if (imageFile) {
+              console.log(`Successfully auto-fetched image for ${field}, uploading...`);
+              const imageField = field === "ltf" ? "ltf_image" : "htf_image";
+              await updateEntry(id, imageField, imageFile);
+            }
+          } catch (fetchErr) {
+            console.warn("Auto-fetch failed:", fetchErr);
+          }
+        }
       } catch (err) {
         console.error("Failed to save on blur:", err);
         setError("Failed to save changes");

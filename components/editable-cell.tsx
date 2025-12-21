@@ -17,8 +17,8 @@ interface EditableCellProps {
   isEditing: boolean
   isSaving: boolean
   onEdit: () => void
-  onUpdateUI: (value: string) => void
-  onSaveOnBlur: (value: string) => void
+  onUpdateUI: (value: string | File) => void
+  onSaveOnBlur: (value: string | File) => void
   onBlur: () => void
 }
 
@@ -385,20 +385,38 @@ export function EditableCell({
       case "ltf":
       case "htf":
         return (
-          <Input
-            value={entry[column] as string}
-            onChange={(e) => {
-              const value = e.target.value
-              onUpdateUI(value)
-            }}
-            onBlur={() => {
-              onSaveOnBlur(entry[column] as string)
-              onBlur()
-            }}
-            className="border-0 shadow-none bg-transparent hover:bg-gray-50 transition-colors focus:bg-white focus:ring-2 focus:ring-blue-500"
-            placeholder={`Enter ${column.toUpperCase()} chart URL...`}
-            autoFocus
-          />
+          <div className="flex flex-col gap-2 p-1">
+            <Input
+              value={entry[column] as string}
+              onChange={(e) => {
+                const value = e.target.value
+                onUpdateUI(value)
+              }}
+              onBlur={() => {
+                onSaveOnBlur(entry[column] as string)
+                onBlur()
+              }}
+              className="border-0 shadow-none bg-transparent hover:bg-gray-50 transition-colors focus:bg-white focus:ring-2 focus:ring-blue-500 text-xs"
+              placeholder={`Enter ${column.toUpperCase()} chart URL...`}
+              autoFocus
+            />
+            <div className="flex items-center gap-2 px-1">
+              <span className="text-[10px] text-slate-500 uppercase font-bold">OR UPLOAD</span>
+              <Input
+                type="file"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    onUpdateUI(file)
+                    onSaveOnBlur(file)
+                    onBlur()
+                  }
+                }}
+                className="h-7 text-[10px] border-dashed border-2 hover:border-blue-400 transition-colors"
+                accept="image/*"
+              />
+            </div>
+          </div>
         )
 
       case "mistake":
@@ -694,14 +712,24 @@ export function EditableCell({
 
     case "ltf":
     case "htf":
+      const imageField = column === "ltf" ? "ltf_image" : "htf_image"
+      const hasImage = !!entry[imageField]
+      
       return (
         <div
           className="p-2 min-h-[50px] flex items-center cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-lg transition-all duration-200"
           onClick={onEdit}
         >
-          <span className="text-gray-700 truncate text-xs">
-            {entry[column] || `Enter ${column.toUpperCase()} chart URL...`}
-          </span>
+          <div className="flex flex-col overflow-hidden">
+            {hasImage && (
+              <span className="text-[10px] text-green-600 font-bold uppercase mb-0.5">
+                Image Uploaded
+              </span>
+            )}
+            <span className="text-gray-700 truncate text-xs">
+              {entry[column] || (hasImage ? "Click to change/add URL" : `Enter ${column.toUpperCase()} chart URL...`)}
+            </span>
+          </div>
           {isSaving && <Loader2 className="ml-2 h-3 w-3 animate-spin text-blue-600" />}
         </div>
       )

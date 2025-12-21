@@ -10,8 +10,8 @@ interface JournalTableProps {
   editingCell: EditingCell | null
   saving: string | null
   onCellClick: (rowId: string, column: keyof JournalEntry, subColumn?: string) => void
-  onUpdateUI: (id: string, field: keyof JournalEntry, value: string, subColumn?: string) => void
-  onSaveOnBlur: (id: string, field: keyof JournalEntry, value: string, subColumn?: string) => void
+  onUpdateUI: (id: string, field: keyof JournalEntry, value: string | File, subColumn?: string) => void
+  onSaveOnBlur: (id: string, field: keyof JournalEntry, value: string | File, subColumn?: string) => void
   onCellBlur: () => void
   onDeleteEntry: (id: string) => void
 }

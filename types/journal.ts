@@ -11,6 +11,8 @@ export interface JournalEntry {
   date: Date | null;
   ltf: string; // LTF chart URL
   htf: string; // HTF chart URL
+  ltf_image: string | null; // LTF chart image path/URL
+  htf_image: string | null; // HTF chart image path/URL
   bias: "buy" | "sell" | "";
   kill_zone: string;
   array: string[]; // Multiple array values
@@ -40,6 +42,8 @@ export interface ApiJournalEntry {
   date: string | null;
   ltf: string;
   htf: string;
+  ltf_image: string | null;
+  htf_image: string | null;
   bias: "buy" | "sell" | "";
   kill_zone: string;
   array: string; // Comma-separated array values from backend
