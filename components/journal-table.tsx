@@ -1,8 +1,8 @@
 "use client"
 
-import { ExternalLink, Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { JournalEntry, EditingCell } from "@/types/journal"
+import type { EditingCell, JournalEntry } from "@/types/journal"
+import { ExternalLink, Loader2, Trash2 } from "lucide-react"
 import { EditableCell } from "./editable-cell"
 
 interface JournalTableProps {
@@ -33,12 +33,7 @@ export function JournalTable({
 
   // Truncation is handled via CSS (tailwind `truncate` classes) inside EditableCell
 
-  // Helper to stringify array-like fields for title
-  const stringifyArrayField = (value: string[] | string | null | undefined): string => {
-    if (!value) return ""
-    if (Array.isArray(value)) return value.join(", ")
-    return value
-  }
+
 
   const renderCell = (
     entry: JournalEntry,
@@ -67,26 +62,25 @@ export function JournalTable({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-[1600px]">
+    <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200">
+      <div className="min-w-[1500px]">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 rounded-t-lg">
-          <div className="grid grid-cols-14 gap-0">
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 first:rounded-tl-lg border-r border-slate-200">Actions</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Date</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">LTF</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">HTF</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Bias</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Kill Zone</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Results</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Array</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">P&L</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Before Trade Emotions</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">During Trade Emotions</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">After Trade Emotions</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 border-r border-slate-200">Mistake</div>
-            <div className="bg-white/95 p-2 font-semibold text-xs text-slate-700 last:rounded-tr-lg">Reason</div>
-
+        <div className="bg-slate-50/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-20 rounded-t-xl overflow-hidden">
+          <div className="grid grid-cols-[120px_110px_140px_140px_100px_100px_120px_120px_90px_150px_150px_150px_1fr_1fr] gap-0">
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50 sticky left-0 z-30">Actions</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50 sticky left-[120px] z-30">Date</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">LTF</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">HTF</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">Bias</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">Kill Zone</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">Results</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">Array</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">P&L</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">Before Emotions</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">During Emotions</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">After Emotions</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">Mistake</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500">Reason</div>
           </div>
         </div>
 
@@ -94,73 +88,73 @@ export function JournalTable({
         {entries.map((entry, index) => (
           <div
             key={entry.id}
-            className={`grid grid-cols-14 gap-0 border-l border-r border-b border-slate-200 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 transition-all duration-150 ${index % 2 === 0 ? "bg-white" : "bg-slate-50/30"
-              } ${index === entries.length - 1 ? "rounded-b-lg" : ""}`}
+            className={`grid grid-cols-[120px_110px_140px_140px_100px_100px_120px_120px_90px_150px_150px_150px_1fr_1fr] gap-0 border-b border-slate-100 items-stretch hover:bg-blue-50/40 transition-all duration-200 group ${
+              index % 2 === 0 ? "bg-white" : "bg-slate-50/20"
+            }`}
           >
-            {/* Actions */}
-            <div className="bg-inherit p-2 flex items-center justify-center gap-1 min-h-[50px]">
+            {/* Actions (Sticky) */}
+            <div className="p-2 flex items-center justify-center gap-1.5 border-r border-slate-100 bg-inherit sticky left-0 z-10 group-hover:bg-blue-50/40 transition-colors">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleViewEntry(entry)}
-                className="h-7 px-2 text-xs gap-1 hover:bg-blue-50 border-blue-200 shadow-sm hover:shadow transition-all duration-150"
+                className="h-8 w-8 p-0 rounded-lg hover:bg-blue-600 hover:text-white border-blue-100 shadow-sm transition-all duration-200"
+                title="View Details"
               >
-                <ExternalLink className="h-3 w-3" />
-                View
+                <ExternalLink className="h-3.5 w-3.5" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onDeleteEntry(entry.id)}
-                className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 shadow-sm hover:shadow transition-all duration-150"
+                className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
                 disabled={saving === entry.id}
+                title="Delete Entry"
               >
-                {saving === entry.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                {saving === entry.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
               </Button>
             </div>
 
-            {/* Normal Fields */}
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+            {/* Date (Sticky) */}
+            <div className="p-2 border-r border-slate-100 bg-inherit sticky left-[120px] z-10 group-hover:bg-blue-50/40 transition-colors">
               {renderCell(entry, "date")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.ltf}>
+
+            {/* Other Fields */}
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "ltf")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.htf}>
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "htf")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "bias")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "kill_zone")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "results")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "array")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden">
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "pnl")}
             </div>
-
-            {/* Emotion columns as main fields */}
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={stringifyArrayField(entry.before_trade_emotions)}>
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "before_trade_emotions")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={stringifyArrayField(entry.in_trade_emotions)}>
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "in_trade_emotions")}
             </div>
-            <div className="bg-inherit p-2 min-h-[50px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={stringifyArrayField(entry.after_trade_emotions)}>
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "after_trade_emotions")}
             </div>
-
-            {/* Mistake & Reason */}
-            <div className="bg-inherit p-2 min-h-[60px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.mistake}>
+            <div className="p-2 border-r border-slate-50 flex items-center overflow-hidden">
               {renderCell(entry, "mistake")}
             </div>
-            <div className="bg-inherit p-2 min-h-[60px] text-xs border-r border-slate-200 flex items-center overflow-hidden" title={entry.reason}>
+            <div className="p-2 flex items-center overflow-hidden">
               {renderCell(entry, "reason")}
             </div>
           </div>

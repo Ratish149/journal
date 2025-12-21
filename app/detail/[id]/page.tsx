@@ -1,15 +1,17 @@
 "use client"
 
-import { useParams, useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
-import { format } from "date-fns"
-import { ArrowLeft, Trash2, Loader2, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { JournalEntry, EditingCell } from "@/types/journal"
-import { journalApi } from "@/lib/api"
+import { AiPredictionCard } from "@/components/ai-prediction-card"
 import { ChartDisplay } from "@/components/chart-display"
 import { EditableCell } from "@/components/editable-cell"
+import { TradeChat } from "@/components/trade-chat"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { journalApi } from "@/lib/api"
+import type { EditingCell, JournalEntry } from "@/types/journal"
+import { format } from "date-fns"
+import { AlertCircle, ArrowLeft, Loader2, Trash2 } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function JournalDetailPage() {
   const params = useParams()
@@ -144,7 +146,7 @@ export default function JournalDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 pb-12">
       {/* Header */}
       <div className="bg-white/70 backdrop-blur-sm border-b border-gray-200/60 top-0 z-10 shadow-sm">
         <div className="max-w-full mx-auto px-8 py-6">
@@ -198,6 +200,11 @@ export default function JournalDetailPage() {
             gradientTo="to-pink-600"
             linkColor="hover:bg-purple-50"
           />
+        </div>
+
+        {/* AI Prediction Section */}
+        <div className="grid grid-cols-1 gap-8">
+          <AiPredictionCard entry={entry} onUpdate={setEntry} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -296,8 +303,9 @@ export default function JournalDetailPage() {
             </CardContent>
           </Card>
         </div>
-        
+
       </div>
+      <TradeChat entry={entry} onUpdate={setEntry} />
     </div>
   )
 }

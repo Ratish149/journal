@@ -1,3 +1,11 @@
+export interface ChatMessage {
+  id: number;
+  entry: string | number;
+  role: "user" | "assistant";
+  content: string;
+  created_at: string;
+}
+
 export interface JournalEntry {
   id: string;
   date: Date | null;
@@ -14,6 +22,9 @@ export interface JournalEntry {
   after_trade_emotions: string[]; // After trade emotions
   mistake: string;
   reason: string;
+  ai_bias_prediction?: string;
+  ai_analysis?: string;
+  chats?: ChatMessage[];
   created_at?: string;
   updated_at?: string;
 }
@@ -40,6 +51,9 @@ export interface ApiJournalEntry {
   after_trade_emotions: string; // Comma-separated emotion values from backend
   mistake: string;
   reason: string;
+  ai_bias_prediction: string | null;
+  ai_analysis: string | null;
+  chats: ChatMessage[];
   created_at: string;
   updated_at: string;
 }

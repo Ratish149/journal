@@ -1,13 +1,13 @@
 "use client"
-import { format } from "date-fns"
-import { CalendarIcon, Loader2, TrendingUp, TrendingDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Badge } from "@/components/ui/badge"
-import { type JournalEntry, EMOTION_OPTIONS, RESULTS_OPTIONS, ARRAY_OPTIONS, BIAS_OPTIONS } from "@/types/journal"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Textarea } from "@/components/ui/textarea"
+import { type JournalEntry, ARRAY_OPTIONS, BIAS_OPTIONS, EMOTION_OPTIONS, RESULTS_OPTIONS } from "@/types/journal"
+import { format } from "date-fns"
+import { CalendarIcon, Loader2, TrendingDown, TrendingUp } from "lucide-react"
 import { MultiSelectCell } from "./multi-select-cell"
 
 interface EditableCellProps {
@@ -39,7 +39,7 @@ export function EditableCell({
     const value = entry[field]
     try {
       if (Array.isArray(value)) {
-        return value
+        return value as string[]
       } else if (typeof value === 'string') {
         return value.split(',').map(s => s.trim()).filter(Boolean)
       }
@@ -76,7 +76,7 @@ export function EditableCell({
 
     try {
       if (Array.isArray(value)) {
-        return value
+        return value as string[]
       } else if (typeof value === 'string') {
         return value.split(',').map(s => s.trim()).filter(Boolean)
       }
@@ -129,7 +129,7 @@ export function EditableCell({
             <MultiSelectCell
               value={biasValues}
               options={Array.from(BIAS_OPTIONS).filter(Boolean)}
-              placeholder={`bias...`}
+              placeholder="bias..."
               isEditing={true}
               isSaving={isSaving}
               onEdit={() => onEdit()}
@@ -197,10 +197,10 @@ export function EditableCell({
               options={EMOTION_OPTIONS}
               placeholder={(() => {
                 switch (subColumn) {
-                  case 'before': return 'Add before trade emotions...';
-                  case 'during': return 'Add during trade emotions...';
-                  case 'after': return 'Add after trade emotions...';
-                  default: return 'Add emotions...';
+                  case 'before': return 'before trade emotions...';
+                  case 'during': return 'during trade emotions...';
+                  case 'after': return 'after trade emotions...';
+                  default: return 'emotions...';
                 }
               })()}
               isEditing={true}
@@ -245,7 +245,7 @@ export function EditableCell({
           <MultiSelectCell
             value={emotionValue}
             options={EMOTION_OPTIONS}
-            placeholder={`Select ${column.replace(/_/g, ' ')}...`}
+            placeholder={`${column.replace(/_trade_emotions/g, '').replace(/_/g, ' ')} emotions...`}
             isEditing={true}
             isSaving={isSaving}
             onEdit={onEdit}
@@ -293,7 +293,7 @@ export function EditableCell({
           <MultiSelectCell
             value={(typeof entry.bias === 'string' ? entry.bias.split(',').map(s => s.trim()).filter(Boolean) : [])}
             options={Array.from(BIAS_OPTIONS).filter(Boolean)}
-            placeholder="Select bias"
+            placeholder="bias..."
             isEditing={true}
             isSaving={isSaving}
             onEdit={onEdit}
@@ -316,7 +316,7 @@ export function EditableCell({
           <MultiSelectCell
             value={Array.isArray(entry.array) ? entry.array : (entry.array as string)?.split(",").map(s => s.trim()).filter(Boolean) || []}
             options={ARRAY_OPTIONS}
-            placeholder="Select arrays"
+            placeholder="arrays..."
             isEditing={true}
             isSaving={isSaving}
             onEdit={onEdit}
@@ -335,7 +335,7 @@ export function EditableCell({
           <MultiSelectCell
             value={Array.isArray(entry.results) ? entry.results : (entry.results as string)?.split(",").map(s => s.trim()).filter(Boolean) || []}
             options={RESULTS_OPTIONS}
-            placeholder="Select results"
+            placeholder="results..."
             isEditing={true}
             isSaving={isSaving}
             onEdit={onEdit}
@@ -612,7 +612,7 @@ export function EditableCell({
         <MultiSelectCell
           value={biasValuesDisplay}
           options={Array.from(BIAS_OPTIONS).filter(Boolean)}
-          placeholder="bias"
+          placeholder="bias..."
           isEditing={false}
           isSaving={isSaving}
           onEdit={onEdit}
@@ -664,7 +664,7 @@ export function EditableCell({
         <MultiSelectCell
           value={arrayValues}
           options={ARRAY_OPTIONS}
-          placeholder="Select arrays"
+          placeholder="arrays..."
           isEditing={false}
           isSaving={isSaving}
           onEdit={onEdit}
@@ -714,9 +714,13 @@ export function EditableCell({
         >
           <span
             className={`text-gray-700 leading-relaxed text-xs truncate`}
-            title={(entry[column] as string) || `Enter ${column}...`}
+            title={Array.isArray(entry[column]) ? (entry[column] as unknown[]).map(String).join(', ') : (entry[column] as string) || `Enter ${column}...`}
           >
-            {entry[column] || `Enter ${column}...`}
+            {column === 'chats' 
+              ? `${entry.chats?.length || 0} messages` 
+              : Array.isArray(entry[column]) 
+                ? (entry[column] as string[]).join(', ') 
+                : (entry[column] as unknown as React.ReactNode) || `Enter ${column}...`}
           </span>
           {isSaving && <Loader2 className="ml-2 h-3 w-3 animate-spin text-blue-600 flex-shrink-0" />}
         </div>

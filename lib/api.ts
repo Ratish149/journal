@@ -1,7 +1,7 @@
 import type {
-  JournalEntry,
-  ApiJournalEntry,
-  TradingStats,
+    ApiJournalEntry,
+    JournalEntry,
+    TradingStats,
 } from "@/types/journal";
 
 const API_BASE_URL =
@@ -56,6 +56,9 @@ function convertApiEntry(apiEntry: ApiJournalEntry): JournalEntry {
       : [],
     mistake: apiEntry.mistake,
     reason: apiEntry.reason,
+    ai_bias_prediction: apiEntry.ai_bias_prediction || undefined,
+    ai_analysis: apiEntry.ai_analysis || undefined,
+    chats: apiEntry.chats || [],
     created_at: apiEntry.created_at,
     updated_at: apiEntry.updated_at,
   };
@@ -312,6 +315,45 @@ export const journalApi = {
       return data;
     } catch (error) {
       console.error("Failed to fetch trading summary:", error);
+      throw error;
+    }
+  },
+
+  // Predict bias using AI
+  async predictBias(id: string): Promise<JournalEntry> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/journal/entries/${id}/predict/`, {
+        method: "POST",
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data: ApiJournalEntry = await response.json();
+      return convertApiEntry(data);
+    } catch (error) {
+      console.error("Failed to predict bias:", error);
+      throw error;
+    }
+  },
+
+  // Send message to AI chat
+  async sendMessage(id: string, content: string): Promise<JournalEntry> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/journal/entries/${id}/chat/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content }),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      // After sending, we re-fetch the entry to get the full chat history including AI response
+      return this.getEntry(id);
+    } catch (error) {
+      console.error("Failed to send message:", error);
       throw error;
     }
   },
