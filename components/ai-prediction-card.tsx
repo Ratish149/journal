@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { journalApi } from "@/lib/api"
 import { JournalEntry } from "@/types/journal"
 import { BrainCircuit, Loader2, Sparkles, Upload } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 interface AiPredictionCardProps {
   entry: JournalEntry
@@ -24,12 +24,6 @@ export function AiPredictionCard({ entry, onUpdate }: AiPredictionCardProps) {
   const [htfFile, setHtfFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
 
-  // Check if AI analysis indicates no images found
-  useEffect(() => {
-    if (entry.ai_analysis && entry.ai_analysis.includes("No valid images")) {
-      setShowUploadModal(true)
-    }
-  }, [entry.ai_analysis])
 
   const handlePredict = async () => {
     setLoading(true)
