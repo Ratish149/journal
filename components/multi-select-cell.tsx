@@ -37,6 +37,7 @@ export function MultiSelectCell({
   const [selectedValues, setSelectedValues] = useState<string[]>(normalizedValue)
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const popupRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const [customValue, setCustomValue] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
@@ -57,7 +58,11 @@ export function MultiSelectCell({
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      // Check if click is outside both the container and the popup
+      const isOutsideContainer = containerRef.current && !containerRef.current.contains(event.target as Node)
+      const isOutsidePopup = popupRef.current && !popupRef.current.contains(event.target as Node)
+      
+      if (isOutsideContainer && isOutsidePopup) {
         setIsOpen(false)
         onBlur()
       }
@@ -168,8 +173,10 @@ export function MultiSelectCell({
             
             {/* Popup Content */}
             <div
+              ref={popupRef}
               className="relative w-[340px] bg-white rounded-2xl shadow-[0_15px_50px_-10px_rgba(0,0,0,0.25)] border border-gray-100 overflow-hidden flex flex-col animate-in zoom-in-95 fade-in duration-200"
               style={{ maxHeight: '90vh' }}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between bg-white">
                 <h3 className="font-bold text-gray-800 text-base tracking-tight capitalize">
@@ -216,6 +223,39 @@ export function MultiSelectCell({
                   <div className="absolute left-3 top-3 text-gray-400">
                     <svg width="14" height="14" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6.5C10 8.433 8.433 10 6.5 10C4.567 10 3 8.433 3 6.5C3 4.567 4.567 3 6.5 3C8.433 3 10 4.567 10 6.5ZM9.30884 10.0159C8.53901 10.6318 7.56251 11 6.5 11C4.01472 11 2 8.98528 2 6.5C2 4.01472 4.01472 2 6.5 2C8.98528 2 11 4.01472 11 6.5C11 7.56251 10.6318 8.53901 10.0159 9.30884L12.8536 12.1464C13.0488 12.3417 13.0488 12.6583 12.8536 12.8536C12.6583 13.0488 12.3417 13.0488 12.1464 12.8536L9.30884 10.0159Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
                   </div>
+                </div>
+              </div>
+
+              {/* Selected Values Section */}
+              {selectedValues.length > 0 && (
+                <div className="px-4 pb-2">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                    Selected ({selectedValues.length})
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedValues.map((val) => (
+                      <Badge
+                        key={val}
+                        variant="secondary"
+                        className={`text-xs ${getBadgeColor ? getBadgeColor(val) : "bg-blue-100 text-blue-800 border-blue-200"} pr-1 flex items-center gap-1`}
+                      >
+                        {val}
+                        <button
+                          onClick={() => handleToggleOption(val)}
+                          className="ml-1 hover:bg-black/10 rounded-full p-0.5 transition-colors"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Available Options Section */}
+              <div className="px-4 pb-2">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
+                  Available Options
                 </div>
               </div>
 

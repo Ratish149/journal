@@ -67,8 +67,8 @@ export function JournalTable({
         {/* Header */}
         <div className="bg-slate-50/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-20 rounded-t-xl overflow-hidden">
           <div className="grid grid-cols-[120px_110px_140px_140px_100px_100px_120px_120px_90px_150px_150px_150px_1fr_1fr] gap-0">
-            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50 sticky left-0 z-30">Actions</div>
-            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50 sticky left-[120px] z-30">Date</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50">Actions</div>
+            <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50">Date</div>
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">LTF</div>
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">HTF</div>
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">Bias</div>
@@ -92,8 +92,8 @@ export function JournalTable({
               index % 2 === 0 ? "bg-white" : "bg-slate-50/20"
             }`}
           >
-            {/* Actions (Sticky) */}
-            <div className="p-2 flex items-center justify-center gap-1.5 border-r border-slate-100 bg-inherit sticky left-0 z-10 group-hover:bg-blue-50/40 transition-colors">
+            {/* Actions */}
+            <div className="p-2 flex items-center justify-center gap-1.5 border-r border-slate-100 bg-inherit group-hover:bg-blue-50/40 transition-colors">
               <Button
                 variant="outline"
                 size="sm"
@@ -115,8 +115,8 @@ export function JournalTable({
               </Button>
             </div>
 
-            {/* Date (Sticky) */}
-            <div className="p-2 border-r border-slate-100 bg-inherit sticky left-[120px] z-10 group-hover:bg-blue-50/40 transition-colors">
+            {/* Date */}
+            <div className="p-2 border-r border-slate-100 bg-inherit group-hover:bg-blue-50/40 transition-colors">
               {renderCell(entry, "date")}
             </div>
 
