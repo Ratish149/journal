@@ -4,10 +4,10 @@ import { JournalTable } from "@/components/journal-table"
 import { StatsCard } from "@/components/stats-card"
 import { StatsFilter } from "@/components/stats-filter"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { useJournalWithFilter } from "@/hooks/use-journal-with-filter"
 import type { EditingCell, JournalEntry } from "@/types/journal"
-import { AlertCircle, Loader2, Plus, X } from "lucide-react"
+import { AlertCircle, LayoutDashboard, Loader2, Plus, X } from "lucide-react"
 import { useState } from "react"
 
 export default function TradingJournal() {
@@ -27,8 +27,6 @@ export default function TradingJournal() {
     applyFilter,
     clearError 
   } = useJournalWithFilter()
-
-
 
   const handleAddNewEntry = async () => {
     try {
@@ -76,130 +74,121 @@ export default function TradingJournal() {
     return total > 0 ? "up" : total < 0 ? "down" : "neutral"
   }
 
-  // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="flex h-screen w-full bg-slate-50 items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-lg text-gray-600">Loading your trading journal...</p>
+          <Loader2 className="h-10 w-10 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-slate-600 font-medium">Loading dashboard...</p>
         </div>
       </div>
     )
   }
 
-  // Main journal list view
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-8">
-      <div className="max-w-full mx-auto">
-        {/* Error Banners */}
+    <div className="min-h-screen bg-slate-50 pb-12 font-sans">
+      
+      <main className="w-full px-4 py-8 space-y-8">
+        
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Trading Journal</h1>
+            <p className="text-slate-500 mt-1">
+              Track your performance and analyze your trading journey.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <StatsFilter 
+              onFilterChange={handleFilterChange}
+              currentMonth={currentFilter.month || undefined}
+              currentYear={currentFilter.year || undefined}
+              showAll={currentFilter.showAll}
+            />
+            <Button
+              onClick={handleAddNewEntry}
+              disabled={saving === "creating"}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-9 px-4 gap-2 transition-all hover:shadow-md"
+            >
+              {saving === "creating" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              {saving === "creating" ? "Creating..." : "New Entry"}
+            </Button>
+          </div>
+        </div>
+
+        {/* Error Banner */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-2">
             <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600" />
-              <p className="text-red-800 font-medium">{error}</p>
+              <div className="p-2 bg-red-100 rounded-full">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+              </div>
+              <p className="text-red-800 font-medium text-sm">{error}</p>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={clearError}
-              className="text-red-600 hover:text-red-800 hover:bg-red-100"
+              className="text-red-600 hover:text-red-800 hover:bg-red-100 h-8 w-8 p-0 rounded-full"
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
         )}
 
-
-
-        {/* Header with Stats */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-indigo-900 bg-clip-text text-transparent">
-              Trading Journal
-            </h1>
-            <StatsFilter 
-              onFilterChange={handleFilterChange}
-              currentMonth={currentFilter.month || undefined}
-              showAll={currentFilter.showAll}
-            />
-          </div>
-      
-          
-          <p className="text-gray-600 text-sm mb-6">Track your trades and analyze your performance</p>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"> {/* Adjusted gap */}
-            {loading ? (
-              <div className="bg-white/70 backdrop-blur-sm border-0 shadow-xl rounded-lg p-6 flex items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-              </div>
-            ) : stats ? (
-              <>
-                <StatsCard 
-                  title="Total P&L" 
-                  value={parseFloat(stats.total_pnl)} 
-                  type="pnl" 
-                  trend={getTotalPnLTrend()} 
-                />
-                <StatsCard 
-                  title="Win Rate" 
-                  value={parseFloat(stats.win_rate)} 
-                  type="percentage" 
-                />
-                <StatsCard 
-                  title="Total Trades" 
-                  value={stats.total_trades} 
-                  type="count" 
-                />
-              </>
-            ) : (
-              <>
-                <StatsCard title="Total P&L" value={0} type="pnl" />
-                <StatsCard title="Win Rate" value={0} type="percentage" />
-                <StatsCard title="Total Trades" value={0} type="count" />
-              </>
-            )}
-          </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {stats ? (
+            <>
+              <StatsCard 
+                title="Total P&L" 
+                value={parseFloat(stats.total_pnl)} 
+                type="pnl" 
+                trend={getTotalPnLTrend()} 
+              />
+              <StatsCard 
+                title="Win Rate" 
+                value={parseFloat(stats.win_rate)} 
+                type="percentage" 
+              />
+              <StatsCard 
+                title="Total Trades" 
+                value={stats.total_trades} 
+                type="count" 
+              />
+            </>
+          ) : (
+            <>
+              <StatsCard title="Total P&L" value={0} type="pnl" />
+              <StatsCard title="Win Rate" value={0} type="percentage" />
+              <StatsCard title="Total Trades" value={0} type="count" />
+            </>
+          )}
         </div>
 
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-          <CardHeader className="pb-6">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                Journal Entries
-              </CardTitle>
-              <Button
-                onClick={handleAddNewEntry}
-                size="sm"
-                disabled={saving === "creating"}
-                className="gap-3 text-base bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50"
-              >
-                {saving === "creating" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}
-                {saving === "creating" ? "Creating..." : "Add Entry"}
-              </Button>
-            </div>
-          </CardHeader>
+        {/* Journal Table Section */}
+        <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
           <CardContent className="p-0">
             {entries.length === 0 ? (
-              <div className="bg-white/80 p-16 text-center">
-                <p className="text-gray-500 mb-6 text-lg">
+              <div className="py-24 text-center bg-slate-50/50">
+                <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-slate-100 mb-4">
+                  <LayoutDashboard className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-lg font-medium text-slate-900 mb-1">No entries found</h3>
+                <p className="text-slate-500 max-w-sm mx-auto mb-6">
                   {currentFilter.showAll 
-                    ? "No journal entries found in your trading history"
-                    : currentFilter.month 
-                    ? `No journal entries for ${stats?.period?.month_name || 'this month'}`
-                    : "No journal entries yet"
+                    ? "You haven't created any journal entries yet."
+                    : `No entries found for ${stats?.period?.month_name || 'this period'}.`
                   }
                 </p>
                 <Button
                   onClick={handleAddNewEntry}
-                  variant="outline"
-                  size="sm"
                   disabled={saving === "creating"}
-                  className="gap-3 hover:bg-blue-50 border-blue-200 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 bg-transparent"
+                  variant="outline"
+                  className="gap-2"
                 >
-                  {saving === "creating" ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}
-                  {saving === "creating" ? "Creating..." : "Add Your First Entry"}
+                  {saving === "creating" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  Add your first entry
                 </Button>
               </div>
             ) : (
@@ -216,7 +205,7 @@ export default function TradingJournal() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </main>
     </div>
   )
 }

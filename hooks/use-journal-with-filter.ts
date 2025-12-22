@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import type { JournalEntry, TradingStats } from "@/types/journal";
 import { journalApi } from "@/lib/api";
+import type { JournalEntry, TradingStats } from "@/types/journal";
+import { useCallback, useEffect, useState } from "react";
 
 export function useJournalWithFilter() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -12,9 +12,11 @@ export function useJournalWithFilter() {
   const [error, setError] = useState<string | null>(null);
   const [currentFilter, setCurrentFilter] = useState<{
     month: number | null;
+    year: number | null;
     showAll: boolean;
   }>({
     month: null,
+    year: null,
     showAll: false,
   });
 
@@ -33,6 +35,7 @@ export function useJournalWithFilter() {
         setStats(statsData);
         setCurrentFilter({
           month: showAll ? null : month || null,
+          year: showAll ? null : year || null,
           showAll: showAll || false,
         });
       } catch (err) {
