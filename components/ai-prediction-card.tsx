@@ -18,6 +18,7 @@ interface AiPredictionCardProps {
 
 export function AiPredictionCard({ entry, onUpdate }: AiPredictionCardProps) {
   const [loading, setLoading] = useState(false)
+  const [downloadingImages, setDownloadingImages] = useState(false)
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [ltfFile, setLtfFile] = useState<File | null>(null)
   const [htfFile, setHtfFile] = useState<File | null>(null)
@@ -33,10 +34,44 @@ export function AiPredictionCard({ entry, onUpdate }: AiPredictionCardProps) {
   const handlePredict = async () => {
     setLoading(true)
     try {
+      // First, try to download and upload images from URLs if they exist
+      let imagesUploaded = false
+      
+      if (entry.ltf && !entry.ltf_image) {
+        setDownloadingImages(true)
+        console.log("Attempting to download LTF image from:", entry.ltf)
+        const ltfFile = await journalApi.fetchExternalImage(entry.ltf, "ltf_chart.png")
+        if (ltfFile) {
+          console.log("LTF image downloaded, uploading to backend...")
+          await journalApi.updateEntry(entry.id, "ltf_image", ltfFile)
+          imagesUploaded = true
+        }
+      }
+      
+      if (entry.htf && !entry.htf_image) {
+        setDownloadingImages(true)
+        console.log("Attempting to download HTF image from:", entry.htf)
+        const htfFile = await journalApi.fetchExternalImage(entry.htf, "htf_chart.png")
+        if (htfFile) {
+          console.log("HTF image downloaded, uploading to backend...")
+          await journalApi.updateEntry(entry.id, "htf_image", htfFile)
+          imagesUploaded = true
+        }
+      }
+      
+      setDownloadingImages(false)
+      
+      // If images were uploaded, wait a moment for backend to process
+      if (imagesUploaded) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+      
+      // Now call the predict API
       const updatedEntry = await journalApi.predictBias(entry.id)
       onUpdate(updatedEntry)
     } catch (error) {
       console.error("Failed to get AI prediction:", error)
+      setDownloadingImages(false)
     } finally {
       setLoading(false)
     }
@@ -94,17 +129,23 @@ export function AiPredictionCard({ entry, onUpdate }: AiPredictionCardProps) {
           </div>
           <Button
             onClick={handlePredict}
-            disabled={loading || !entry.ltf || !entry.htf}
+            disabled={loading || downloadingImages || !entry.ltf || !entry.htf}
             variant="outline"
             size="sm"
             className="gap-2 border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300 transition-all rounded-xl shadow-sm"
           >
-            {loading ? (
+            {loading || downloadingImages ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Sparkles className="h-4 w-4" />
             )}
-            {entry.ai_bias_prediction ? "Re-analyze" : "Analyze Charts"}
+            {downloadingImages 
+              ? "Downloading Images..." 
+              : loading 
+              ? "Analyzing..." 
+              : entry.ai_bias_prediction 
+              ? "Re-analyze" 
+              : "Analyze Charts"}
           </Button>
         </CardHeader>
         <CardContent className="relative space-y-4">
