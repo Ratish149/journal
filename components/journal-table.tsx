@@ -66,7 +66,7 @@ export function JournalTable({
       <div className="min-w-[1900px]">
         {/* Header */}
         <div className="bg-slate-50/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-20 rounded-t-xl overflow-hidden">
-          <div className="grid grid-cols-[120px_110px_140px_140px_100px_100px_120px_120px_90px_150px_150px_150px_200px_200px] gap-0">
+          <div className="grid grid-cols-[100px_110px_80px_80px_80px_100px_80px_100px_90px_120px_120px_120px_350px_350px] gap-0">
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50">Actions</div>
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50">Date</div>
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">LTF</div>
@@ -88,7 +88,7 @@ export function JournalTable({
         {entries.map((entry, index) => (
           <div
             key={entry.id}
-            className={`grid grid-cols-[120px_110px_140px_140px_100px_100px_120px_120px_90px_150px_150px_150px_200px_200px] gap-0 border-b border-slate-100 items-stretch hover:bg-blue-50/40 transition-all duration-200 group ${
+            className={`grid grid-cols-[100px_110px_80px_80px_80px_100px_80px_100px_90px_120px_120px_120px_350px_350px] gap-0 border-b border-slate-100 items-stretch hover:bg-blue-50/40 transition-all duration-200 group ${
               index % 2 === 0 ? "bg-white" : "bg-slate-50/20"
             }`}
           >

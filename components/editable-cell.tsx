@@ -715,7 +715,11 @@ export function EditableCell({
           onClick={onEdit}
         >
           <span
-            className={`text-gray-700 leading-relaxed text-xs truncate`}
+            className={`text-gray-700 leading-relaxed text-xs ${
+              ['mistake', 'reason'].includes(column) 
+                ? "whitespace-pre-wrap break-words" 
+                : "truncate"
+            }`}
             title={Array.isArray(entry[column]) ? (entry[column] as unknown[]).map(String).join(', ') : (entry[column] as string) || `Enter ${column}...`}
           >
             {column === 'chats' 
