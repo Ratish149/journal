@@ -1,11 +1,66 @@
 import type {
   ApiJournalEntry,
+  CreateJournalEntryData,
+  DashboardData,
   JournalEntry,
   TradingStats,
 } from "@/types/journal";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+
+function formatDateForApi(value?: Date | null): string | null {
+  if (!value) return null;
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function joinList(value?: string[]) {
+  return Array.isArray(value) ? value.filter(Boolean).join(", ") : "";
+}
+
+function buildEntryPayload(payload?: CreateJournalEntryData) {
+  return {
+    date: formatDateForApi(payload?.date ?? null),
+    ltf: payload?.ltf ?? "",
+    htf: payload?.htf ?? "",
+    bias: payload?.bias ?? "",
+    kill_zone: payload?.kill_zone ?? "",
+    array: joinList(payload?.array),
+    results: joinList(payload?.results),
+    pnl: payload?.pnl != null ? String(payload.pnl) : "0",
+    emotions: joinList(payload?.emotions),
+    before_trade_emotions: joinList(payload?.before_trade_emotions),
+    in_trade_emotions: joinList(payload?.in_trade_emotions),
+    after_trade_emotions: joinList(payload?.after_trade_emotions),
+    mistake: payload?.mistake ?? "",
+    reason: payload?.reason ?? "",
+  };
+}
+
+function buildEntryBody(payload?: CreateJournalEntryData): {
+  body: string | FormData;
+  headers: Record<string, string>;
+} {
+  const hasFiles = !!(payload?.ltf_image || payload?.htf_image);
+  const baseFields = buildEntryPayload(payload);
+  const headers: Record<string, string> = {};
+
+  if (hasFiles) {
+    const formData = new FormData();
+    Object.entries(baseFields).forEach(([key, value]) => {
+      formData.append(key, value ?? "");
+    });
+    if (payload?.ltf_image) formData.append("ltf_image", payload.ltf_image);
+    if (payload?.htf_image) formData.append("htf_image", payload.htf_image);
+    return { body: formData, headers };
+  }
+
+  headers["Content-Type"] = "application/json";
+  return { body: JSON.stringify(baseFields), headers };
+}
 
 // Helper function to convert API response to frontend format
 function convertApiEntry(apiEntry: ApiJournalEntry): JournalEntry {
@@ -120,30 +175,14 @@ export const journalApi = {
     }
   },
 
-  // Create a new empty journal entry
-  async createEntry(): Promise<JournalEntry> {
+  // Create a journal entry (empty or with trade data)
+  async createEntry(payload?: CreateJournalEntryData): Promise<JournalEntry> {
     try {
+      const { body, headers } = buildEntryBody(payload);
       const response = await fetch(`${API_BASE_URL}/journal/entries/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          date: null,
-          ltf: "",
-          htf: "",
-          bias: "",
-          kill_zone: "",
-          array: "",
-          results: "",
-          pnl: "0",
-          emotions: "",
-          before_trade_emotions: "",
-          in_trade_emotions: "",
-          after_trade_emotions: "",
-          mistake: "",
-          reason: "",
-        }),
+        headers,
+        body,
       });
       if (!response.ok) {
         const errorText = await response.text();
@@ -155,6 +194,32 @@ export const journalApi = {
       return convertApiEntry(data);
     } catch (error) {
       console.error("Failed to create entry:", error);
+      throw error;
+    }
+  },
+
+  // Update a full journal entry from the trade form
+  async updateFullEntry(
+    id: string,
+    payload: CreateJournalEntryData
+  ): Promise<JournalEntry> {
+    try {
+      const { body, headers } = buildEntryBody(payload);
+      const response = await fetch(`${API_BASE_URL}/journal/entries/${id}/`, {
+        method: "PATCH",
+        headers,
+        body,
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `HTTP error! status: ${response.status}, message: ${errorText}`
+        );
+      }
+      const data: ApiJournalEntry = await response.json();
+      return convertApiEntry(data);
+    } catch (error) {
+      console.error("Failed to update entry:", error);
       throw error;
     }
   },
@@ -323,6 +388,36 @@ export const journalApi = {
       return data;
     } catch (error) {
       console.error("Failed to fetch trading summary:", error);
+      throw error;
+    }
+  },
+
+  // Get full dashboard analytics
+  async getDashboard(
+    month?: number,
+    year?: number,
+    showAll?: boolean
+  ): Promise<DashboardData> {
+    try {
+      let url = `${API_BASE_URL}/journal/dashboard/`;
+      const params = new URLSearchParams();
+      if (showAll) {
+        params.append("all", "true");
+      } else if (month && year) {
+        params.append("month", month.toString());
+        params.append("year", year.toString());
+      }
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return (await response.json()) as DashboardData;
+    } catch (error) {
+      console.error("Failed to fetch dashboard:", error);
       throw error;
     }
   },

@@ -1,9 +1,7 @@
 "use client"
 
-import TradingJournal from "@/components/trading-journal"
+import { DashboardView } from "@/components/dashboard-view"
 
 export default function Home() {
-  return (
-    <TradingJournal />
-  );
+  return <DashboardView />
 }

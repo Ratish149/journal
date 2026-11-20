@@ -1,17 +1,23 @@
 "use client"
 
+import { AddTradeForm } from "@/components/add-trade-form"
 import { JournalTable } from "@/components/journal-table"
 import { StatsCard } from "@/components/stats-card"
 import { StatsFilter } from "@/components/stats-filter"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useJournalWithFilter } from "@/hooks/use-journal-with-filter"
-import type { EditingCell, JournalEntry } from "@/types/journal"
+import type {
+  CreateJournalEntryData,
+  EditingCell,
+  JournalEntry,
+} from "@/types/journal"
 import { AlertCircle, LayoutDashboard, Loader2, Plus, X } from "lucide-react"
 import { useState } from "react"
 
 export default function TradingJournal() {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
+  const [addTradeOpen, setAddTradeOpen] = useState(false)
 
   const { 
     entries, 
@@ -28,12 +34,12 @@ export default function TradingJournal() {
     clearError 
   } = useJournalWithFilter()
 
-  const handleAddNewEntry = async () => {
-    try {
-      await createEntry()
-    } catch (error) {
-      console.error("Failed to create entry:", error)
-    }
+  const handleAddNewEntry = () => {
+    setAddTradeOpen(true)
+  }
+
+  const handleSaveTrade = async (data: CreateJournalEntryData) => {
+    await createEntry(data)
   }
 
   const handleUpdateUI = (id: string, field: keyof JournalEntry, value: string | File) => {
@@ -107,11 +113,10 @@ export default function TradingJournal() {
             />
             <Button
               onClick={handleAddNewEntry}
-              disabled={saving === "creating"}
-              className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm h-9 px-4 gap-2 transition-all hover:shadow-md"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm h-9 px-4 gap-2 transition-all hover:shadow-md"
             >
-              {saving === "creating" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              {saving === "creating" ? "Creating..." : "New Entry"}
+              <Plus className="h-4 w-4" />
+              Add Trade
             </Button>
           </div>
         </div>
@@ -183,12 +188,11 @@ export default function TradingJournal() {
                 </p>
                 <Button
                   onClick={handleAddNewEntry}
-                  disabled={saving === "creating"}
                   variant="outline"
                   className="gap-2"
                 >
-                  {saving === "creating" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                  Add your first entry
+                  <Plus className="h-4 w-4" />
+                  Add your first trade
                 </Button>
               </div>
             ) : (
@@ -206,6 +210,13 @@ export default function TradingJournal() {
           </CardContent>
         </Card>
       </main>
+
+      <AddTradeForm
+        open={addTradeOpen}
+        onOpenChange={setAddTradeOpen}
+        onSubmit={handleSaveTrade}
+        saving={saving === "creating"}
+      />
     </div>
   )
 }

@@ -76,6 +76,38 @@ export interface TradingStats {
   };
 }
 
+export interface DashboardPoint {
+  date: string;
+  value: number;
+}
+
+export interface DashboardData {
+  net_pnl: number;
+  total_trades: number;
+  wins: number;
+  losses: number;
+  breakeven: number;
+  win_rate: number | null;
+  profit_factor: number | null;
+  profit_factor_infinite?: boolean;
+  avg_win: number | null;
+  avg_loss: number | null;
+  day_win_rate: number | null;
+  green_days: number;
+  trading_days: number;
+  buy_count: number;
+  sell_count: number;
+  cumulative: DashboardPoint[];
+  daily_pnl: DashboardPoint[];
+  recent: ApiJournalEntry[];
+  period: {
+    all?: boolean;
+    month?: number;
+    year?: number;
+    month_name?: string;
+  };
+}
+
 export const EMOTION_OPTIONS = [
   "Confident",
   "Anxious",
@@ -100,8 +132,36 @@ export const RESULTS_OPTIONS = [
   "Win",
   "Loss",
   "Break Even",
+  "Open",
   "Not Triggered",
   "Missed",
   "Monday",
   "News",
 ] as const;
+
+export const KILL_ZONE_OPTIONS = [
+  "London",
+  "New York",
+  "Asian",
+  "London Close",
+  "Overlap",
+] as const;
+
+export interface CreateJournalEntryData {
+  date?: Date | null;
+  ltf?: string;
+  htf?: string;
+  ltf_image?: File | null;
+  htf_image?: File | null;
+  bias?: "buy" | "sell" | "";
+  kill_zone?: string;
+  array?: string[];
+  results?: string[];
+  pnl?: number | null;
+  emotions?: string[];
+  before_trade_emotions?: string[];
+  in_trade_emotions?: string[];
+  after_trade_emotions?: string[];
+  mistake?: string;
+  reason?: string;
+}

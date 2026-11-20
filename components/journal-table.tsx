@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import type { EditingCell, JournalEntry } from "@/types/journal"
-import { ExternalLink, Loader2, Trash2 } from "lucide-react"
+import { ExternalLink, Loader2, Pencil, Trash2 } from "lucide-react"
 import { EditableCell } from "./editable-cell"
 
 interface JournalTableProps {
@@ -14,6 +14,7 @@ interface JournalTableProps {
   onSaveOnBlur: (id: string, field: keyof JournalEntry, value: string | File, subColumn?: string) => void
   onCellBlur: () => void
   onDeleteEntry: (id: string) => void
+  onEditEntry?: (entry: JournalEntry) => void
 }
 
 export function JournalTable({
@@ -25,6 +26,7 @@ export function JournalTable({
   onSaveOnBlur,
   onCellBlur,
   onDeleteEntry,
+  onEditEntry,
 }: JournalTableProps) {
 
   const handleViewEntry = (entry: JournalEntry) => {
@@ -66,7 +68,7 @@ export function JournalTable({
       <div className="min-w-[1900px]">
         {/* Header */}
         <div className="bg-slate-50/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-20 rounded-t-xl overflow-hidden">
-          <div className="grid grid-cols-[100px_110px_80px_80px_80px_100px_80px_100px_90px_120px_120px_120px_350px_350px] gap-0">
+          <div className="grid grid-cols-[140px_110px_80px_80px_80px_100px_80px_100px_90px_120px_120px_120px_350px_350px] gap-0">
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50">Actions</div>
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100 bg-slate-50">Date</div>
             <div className="p-3 font-bold text-[10px] uppercase tracking-wider text-slate-500 border-r border-slate-100">LTF</div>
@@ -88,12 +90,12 @@ export function JournalTable({
         {entries.map((entry, index) => (
           <div
             key={entry.id}
-            className={`grid grid-cols-[100px_110px_80px_80px_80px_100px_80px_100px_90px_120px_120px_120px_350px_350px] gap-0 border-b border-slate-100 items-stretch hover:bg-blue-50/40 transition-all duration-200 group ${
+            className={`grid grid-cols-[140px_110px_80px_80px_80px_100px_80px_100px_90px_120px_120px_120px_350px_350px] gap-0 border-b border-slate-100 items-stretch hover:bg-blue-50/40 transition-all duration-200 group ${
               index % 2 === 0 ? "bg-white" : "bg-slate-50/20"
             }`}
           >
             {/* Actions */}
-            <div className="p-2 flex items-center justify-center gap-1.5 border-r border-slate-100 bg-inherit group-hover:bg-blue-50/40 transition-colors">
+            <div className="p-2 flex items-center justify-center gap-1 border-r border-slate-100 bg-inherit group-hover:bg-blue-50/40 transition-colors">
               <Button
                 variant="outline"
                 size="sm"
@@ -103,6 +105,17 @@ export function JournalTable({
               >
                 <ExternalLink className="h-3.5 w-3.5" />
               </Button>
+              {onEditEntry && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEditEntry(entry)}
+                  className="h-8 w-8 p-0 rounded-lg border-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white shadow-sm transition-all duration-200"
+                  title="Edit Trade"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"

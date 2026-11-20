@@ -1,7 +1,11 @@
 "use client";
 
 import { journalApi } from "@/lib/api";
-import type { JournalEntry, TradingStats } from "@/types/journal";
+import type {
+  CreateJournalEntryData,
+  JournalEntry,
+  TradingStats,
+} from "@/types/journal";
 import { useCallback, useEffect, useState } from "react";
 
 export function useJournalWithFilter() {
@@ -48,12 +52,23 @@ export function useJournalWithFilter() {
     []
   );
 
-  const createEntry = useCallback(async () => {
+  const createEntry = useCallback(async (payload?: CreateJournalEntryData) => {
     setSaving("creating");
     setError(null);
     try {
-      const newEntry = await journalApi.createEntry();
+      const newEntry = await journalApi.createEntry(payload);
       setEntries((prev) => [newEntry, ...prev]);
+      // Refresh stats after creating a trade
+      try {
+        const statsData = await journalApi.getTradingStats(
+          currentFilter.showAll ? undefined : currentFilter.month || undefined,
+          currentFilter.showAll ? undefined : currentFilter.year || undefined,
+          currentFilter.showAll
+        );
+        setStats(statsData);
+      } catch {
+        // Non-blocking — entry was created
+      }
       return newEntry;
     } catch (err) {
       console.error("Failed to create entry:", err);
@@ -62,7 +77,7 @@ export function useJournalWithFilter() {
     } finally {
       setSaving(null);
     }
-  }, []);
+  }, [currentFilter]);
 
   const updateEntry = useCallback(
     async (id: string, field: keyof JournalEntry, value: any) => {

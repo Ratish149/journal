@@ -46,14 +46,14 @@ export default function JournalDetailPage() {
   }, [entryId])
 
   const handleBack = () => {
-    router.push("/")
+    router.push("/trades")
   }
 
   const handleDelete = async (id: string) => {
     try {
       setSaving(id)
       await journalApi.deleteEntry(id)
-      router.push("/")
+      router.push("/trades")
     } catch (error) {
       console.error("Failed to delete entry:", error)
       setError("Failed to delete entry")
@@ -126,7 +126,7 @@ export default function JournalDetailPage() {
           <p className="text-lg text-gray-600 mb-4">{error}</p>
           <Button onClick={handleBack} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to Journal
+            Back to Trades
           </Button>
         </div>
       </div>
@@ -140,7 +140,7 @@ export default function JournalDetailPage() {
           <p className="text-lg text-gray-600 mb-4">Entry not found</p>
           <Button onClick={handleBack} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to Journal
+            Back to Trades
           </Button>
         </div>
       </div>
@@ -161,7 +161,7 @@ export default function JournalDetailPage() {
                 className="gap-3 text-base hover:bg-blue-50 transition-colors rounded-xl"
               >
                 <ArrowLeft className="h-5 w-5" />
-                Back to Journal
+                Back to Trades
               </Button>
               <div className="h-8 w-px bg-gray-300" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
